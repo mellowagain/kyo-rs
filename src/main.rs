@@ -17,13 +17,17 @@
 */
 
 extern crate web_view;
+extern crate serde_json;
 
+static SHIRO_IP: &'static str = r#"209.97.182.162"#;
+static MIRROR_IP: &'static str = r#"209.97.182.162"#;
+static CERT_URL: &'static str = r#"https://shiro.host/cert.pem"#;
 static CONTENT: &'static str = include_str!("../resources/index.include.html");
 
 fn main() {
     let init_cb = |_webview| {};
-    let frontend_cb = |_webview: &mut _, _arg: &_, _userdata: &mut _| {};
     let user_data = ();
+
     web_view::run(
         "kyo-rs",
         web_view::Content::Html(CONTENT),
@@ -31,7 +35,23 @@ fn main() {
         false,
         true,
         init_cb,
-        frontend_cb,
+        move |web_view, args, user_data| {
+            let json: serde_json::Value = serde_json::from_str(args).unwrap();
+            let cmd: &str = json["cmd"].as_str().unwrap();
+
+            match cmd {
+                "connect" => {
+                    println!("Connect invoked with {}", json["address"].as_str().unwrap());
+                }
+                "disconnect" => {
+                    println!("Disconnect invoked")
+                }
+                "install" => {
+                    println!("Install invoked")
+                }
+                _ => unimplemented!()
+            }
+        },
         user_data
     );
 }

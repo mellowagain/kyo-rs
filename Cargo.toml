@@ -26,3 +26,4 @@ include = [ "resources/index.include.html" ]
 
 [dependencies]
 web-view = "0.2.1"
+serde_json = "1.0.31"
