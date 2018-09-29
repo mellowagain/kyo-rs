@@ -27,3 +27,10 @@ include = [ "resources/index.include.html" ]
 [dependencies]
 web-view = "0.2.1"
 serde_json = "1.0.31"
+libc = "0.2.43"
+
+[target.'cfg(windows)'.dependencies]
+winapi = "0.3.6"
+user32-sys = "0.2.0"
+
+[target.'cfg(unix)'.dependencies]
