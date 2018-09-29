@@ -1,9 +1,10 @@
+extern crate std;
 extern crate user32;
 extern crate winapi;
 
 pub fn is_root() -> bool {
     unsafe {
-        user32::IsUserAnAdmin()
+        user32::IsUserAnAdmin() // This doesn't exist
     }
 }
 
