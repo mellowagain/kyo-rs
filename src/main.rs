@@ -25,12 +25,14 @@ mod platform_utils;
 
 #[cfg(windows)]
 use platform_utils::win32 as utils;
+
 #[cfg(unix)]
 use platform_utils::nix as utils;
 
 static SHIRO_IP: &'static str = r#"209.97.182.162"#;
 static MIRROR_IP: &'static str = r#"209.97.182.162"#;
 static CERT_URL: &'static str = r#"https://shiro.host/cert.pem"#;
+static RESULT_CERT_NAME: &'static str = r#"shiro.crt"#; // Always needs to end in .crt
 static CONTENT: &'static str = include_str!("../resources/index.include.html");
 
 fn main() {
@@ -59,17 +61,17 @@ fn main() {
         },
         move |web_view, args, user_data| {
             let json: serde_json::Value = serde_json::from_str(args).unwrap();
-            let cmd: &str = json["cmd"].as_str().unwrap();
+            let cmd = json["cmd"].as_str().unwrap();
+            let address = json["address"].as_str().unwrap_or_default();
 
             match cmd {
                 "connect" => {
-                    println!("Connect invoked with {}", json["address"].as_str().unwrap());
+                    hosts::overwrite(address);
                 }
                 "disconnect" => {
-                    println!("Disconnect invoked");
+                    hosts::revert();
                 }
                 "install" => {
-                    println!("Installing certificate in trusted root authorities.");
                     cert::install_cert();
                 }
                 _ => unimplemented!()

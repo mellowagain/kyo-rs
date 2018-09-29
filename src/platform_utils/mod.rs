@@ -1,3 +1,5 @@
+use RESULT_CERT_NAME;
+
 #[cfg(windows)]
 pub mod win32;
 
