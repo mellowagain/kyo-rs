@@ -39,7 +39,7 @@ fn main() {
     let user_data = ();
 
     if !utils::is_root() {
-        utils::msg_box("This program needs to be run as administrator.");
+        utils::send_notify("Please run this program with elevated permissions. (Administrator or root)");
         std::process::exit(1);
     }
 

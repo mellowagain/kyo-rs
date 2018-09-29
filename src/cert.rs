@@ -6,24 +6,27 @@ use std::io::Read;
 
 pub fn install_cert() {
     std::thread::spawn(move || {
-        download_cert();
-
-        println!("Successfully installed certificate.");
+        if download_cert() {
+            super::utils::send_notify("Certificate has been successfully installed.");
+        }
     });
 }
 
-fn download_cert() {
+fn download_cert() -> bool {
     let mut response = reqwest::get(super::CERT_URL).unwrap();
 
     if !response.status().is_success() {
-        super::utils::msg_box(&format!(
-            "Unable to download certificate, server returned {}.", response.status()
-        ));
-        return;
+        super::utils::send_notify(format!(
+            "Certificate could not be downloaded. Remote server returned {}.", response.status()
+        ).as_str());
+
+        return false;
     }
 
     let mut content = String::new();
     response.read_to_string(&mut content).expect("Unable to read response.");
 
     super::utils::install_cert(content.as_str());
+
+    return true;
 }
