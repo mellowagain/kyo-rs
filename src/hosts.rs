@@ -34,7 +34,6 @@ static HOSTS_PATH: &'static str = r#"/etc/hosts"#;
 static NEW_LINE: &'static str = "\n";
 
 pub fn overwrite(address: &str) -> bool {
-    return false;
     let mut success = false;
 
     std::thread::spawn(move || {
@@ -93,6 +92,25 @@ pub fn revert() -> bool {
     std::thread::spawn(move || {
 
     });
+
+    return false;
+}
+
+pub fn is_connected() -> bool {
+    let mut file = std::fs::File::open(HOSTS_PATH).unwrap();
+
+    for content in std::io::BufReader::new(file).lines() {
+        let unwrapped = content.unwrap();
+        let line = unwrapped.as_str();
+
+        if line.starts_with("#") || !line.contains("ppy.sh") {
+            continue;
+        }
+
+        if line.contains(super::SHIRO_IP) || line.contains(super::MIRROR_IP) {
+            return true;
+        }
+    }
 
     return false;
 }

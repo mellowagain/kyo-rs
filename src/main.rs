@@ -51,11 +51,15 @@ fn main() {
         true,
         move |web_view| {
             std::thread::spawn(move || {
+                // Run this outside of the UI thread to not block the init process
+                let connected = hosts::is_connected();
+                let connect_address = format!("document.getElementById('connect-address').value = '{}';", SHIRO_IP);
+                let button_changer = if connected { "toggleConnectButton();" } else { "" };
+                let js = &format!("{}{}", connect_address, button_changer);
+
+                // and send it off into the deep void of the UI
                 web_view.dispatch(|web_view, _user_data| {
-                    web_view.eval(&format!(
-                        "document.getElementById('connect-address').value = '{}';",
-                        SHIRO_IP
-                    ));
+                    web_view.eval(js);
                 });
             });
         },
