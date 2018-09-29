@@ -18,6 +18,8 @@
 
 "use strict";
 
+// Invoked by frontend
+
 function connectShiro() {
     invokeBackend(
         {
@@ -32,7 +34,7 @@ function connectBancho() {
         {
             cmd: "disconnect"
         }
-    )
+    );
 }
 
 function installCertificate() {
@@ -40,9 +42,39 @@ function installCertificate() {
         {
             cmd: "install"
         }
-    )
+    );
 }
 
 function invokeBackend(args) {
     window.external.invoke(JSON.stringify(args));
+}
+
+// Invoked by backend
+
+function toggleConnectButton() {
+    let connectButton = document.getElementById("btn-connect");
+
+    connectButton.classList.toggle("pink");
+    connectButton.classList.toggle("blue");
+
+    // We just switched to Shiro
+    if (connectButton.classList.contains("blue")) {
+        document.getElementById("text-connect").innerHTML = "Switch to Bancho";
+        document.getElementById("icon-switch").className = "fas fa-unlink";
+    }
+
+    // We just switched back to Bancho
+    if (connectButton.classList.contains("pink")) {
+        document.getElementById("text-connect").innerHTML = "Switch to Shiro";
+        document.getElementById("icon-switch").className = "fas fa-sync-alt";
+    }
+}
+
+function displayError() {
+    let input = document.getElementById("input-address");
+    input.classList.add("shake");
+
+    setTimeout(() => {
+        input.classList.remove("shake");
+    }, 820);
 }

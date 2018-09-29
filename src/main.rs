@@ -30,7 +30,7 @@ use platform_utils::win32 as utils;
 use platform_utils::nix as utils;
 
 static SHIRO_IP: &'static str = r#"209.97.182.162"#;
-static MIRROR_IP: &'static str = r#"209.97.182.162"#;
+static MIRROR_IP: &'static str = r#"209.97.182.162"#; // Won't be displayed to user but put in hosts regardless
 static CERT_URL: &'static str = r#"https://shiro.host/cert.pem"#;
 static RESULT_CERT_NAME: &'static str = r#"shiro.crt"#; // Always needs to end in .crt
 static CONTENT: &'static str = include_str!("../resources/index.include.html");
@@ -51,7 +51,7 @@ fn main() {
         true,
         move |web_view| {
             std::thread::spawn(move || {
-                web_view.dispatch(|web_view, user_data| {
+                web_view.dispatch(|web_view, _user_data| {
                     web_view.eval(&format!(
                         "document.getElementById('connect-address').value = '{}';",
                         SHIRO_IP
@@ -59,17 +59,18 @@ fn main() {
                 });
             });
         },
-        move |web_view, args, user_data| {
+        move |web_view, args, _user_data| {
             let json: serde_json::Value = serde_json::from_str(args).unwrap();
             let cmd = json["cmd"].as_str().unwrap();
             let address = json["address"].as_str().unwrap_or_default();
 
             match cmd {
                 "connect" => {
-                    hosts::overwrite(address);
+                    let action = if hosts::overwrite(address) { "toggleConnectButton();" } else { "displayError();" };
+                    web_view.eval(action);
                 }
                 "disconnect" => {
-                    hosts::revert();
+                    let action = if hosts::revert() { "toggleConnectButton();" } else { "displayError();" };
                 }
                 "install" => {
                     cert::install_cert();

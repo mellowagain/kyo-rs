@@ -33,21 +33,21 @@
     <div class="background"></div>
     <div class="background-overlay"></div>
     <div class="content">
-        <div class="input address">
+        <div id="input-address" class="input address">
             <label>
                 <input id="connect-address" type="text" value="127.0.0.1">
             </label>
         </div>
-        <div class="button pink switch" onclick="connectShiro()">
-            <span class="text">Switch to Shiro</span>
+        <div id="btn-connect" class="button pink switch" onclick="connectShiro()">
+            <span id="text-connect" class="text">Switch to Shiro</span>
             <span class="icon">
-                <i class="fas fa-sync-alt"></i>
+                <i id="icon-switch" class="fas fa-sync-alt"></i>
             </span>
         </div>
-        <div class="button green" onclick="installCertificate()">
-            <span class="text">Install certificate</span>
+        <div id="btn-install" class="button green" onclick="installCertificate()">
+            <span id="text-install" class="text">Install certificate</span>
             <span class="icon">
-                <i class="fas fa-file"></i>
+                <i id="icon-install" class="fas fa-file"></i>
             </span>
         </div>
     </div>
