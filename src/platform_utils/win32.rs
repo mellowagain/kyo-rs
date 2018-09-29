@@ -2,7 +2,9 @@ extern crate user32;
 extern crate winapi;
 
 pub fn is_root() -> bool {
-    user32::IsUserAnAdmin()
+    unsafe {
+        user32::IsUserAnAdmin()
+    }
 }
 
 pub fn msg_box(msg: &str) {

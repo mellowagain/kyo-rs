@@ -50,10 +50,10 @@ fn main() {
         move |web_view| {
             std::thread::spawn(move || {
                 web_view.dispatch(|web_view, user_data| {
-                    /*web_view.eval(&format!(
-                        "document.getElementById(\"connect-address\").value = {}",
+                    web_view.eval(&format!(
+                        "document.getElementById('connect-address').value = '{}';",
                         SHIRO_IP
-                    ));*/
+                    ));
                 });
             });
         },
@@ -66,7 +66,7 @@ fn main() {
                     println!("Connect invoked with {}", json["address"].as_str().unwrap());
                 }
                 "disconnect" => {
-                    println!("Disconnect invoked")
+                    println!("Disconnect invoked");
                 }
                 "install" => {
                     println!("Installing certificate in trusted root authorities.");
