@@ -66,11 +66,10 @@ fn main() {
 
             match cmd {
                 "connect" => {
-                    let action = if hosts::overwrite(address) { "toggleConnectButton();" } else { "displayError();" };
-                    web_view.eval(action);
+                    web_view.eval(if hosts::overwrite(address) { "toggleConnectButton();" } else { "displayError();" });
                 }
                 "disconnect" => {
-                    let action = if hosts::revert() { "toggleConnectButton();" } else { "displayError();" };
+                    web_view.eval(if hosts::revert() { "toggleConnectButton();" } else { "displayError();" });
                 }
                 "install" => {
                     cert::install_cert();
