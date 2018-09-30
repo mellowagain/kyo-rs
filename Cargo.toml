@@ -22,6 +22,7 @@ version = "0.0.1"
 authors = [ "Marc3842h <info@marcsteiner.me>" ]
 readme = "README.md"
 publish = false
+build = "build.rs"
 
 [dependencies]
 web-view = "0.2.1"
@@ -29,6 +30,10 @@ serde_json = "1.0.31"
 libc = "0.2.43"
 hyper = "0.12.11"
 reqwest = "0.9.2"
+
+[build-dependencies]
+html-minifier = "1.1.2"
+base64 = "0.9.3"
 
 [target.'cfg(windows)'.dependencies]
 winapi = "0.3.6"
