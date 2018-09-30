@@ -61,12 +61,14 @@ function toggleConnectButton() {
     if (connectButton.classList.contains("blue")) {
         document.getElementById("text-connect").innerHTML = "Switch to Bancho";
         document.getElementById("icon-switch").className = "fas fa-unlink";
+        connectButton.onclick = connectBancho;
     }
 
     // We just switched back to Bancho
     if (connectButton.classList.contains("pink")) {
         document.getElementById("text-connect").innerHTML = "Switch to Shiro";
         document.getElementById("icon-switch").className = "fas fa-sync-alt";
+        connectButton.onclick = connectShiro;
     }
 }
 

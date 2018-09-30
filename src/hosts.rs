@@ -17,7 +17,7 @@
 */
 
 extern crate std;
-extern crate web_view;
+extern crate reqwest;
 
 use std::io::Read;
 use std::io::Write;
@@ -34,66 +34,111 @@ static HOSTS_PATH: &'static str = r#"/etc/hosts"#;
 static NEW_LINE: &'static str = "\n";
 
 pub fn overwrite(address: &str) -> bool {
-    let mut success = false;
+    let mut changed_perms = false;
 
-    std::thread::spawn(move || {
-        let mut hosts = std::fs::File::create(HOSTS_PATH).expect("Hosts file does not exist.");
-        let mut content = String::new();
+    if address.is_empty() {
+        super::utils::send_notify("Target address is empty.");
+        return false;
+    }
 
-        hosts.read_to_string(&mut content).expect("Unable to read hosts file.");
+    if is_connected() {
+        super::utils::send_notify("You are already connected.");
+        return true;
+    }
 
-        let osu = format!("{} osu.ppy.sh", super::SHIRO_IP);
-        let c = format!("{} c.ppy.sh", super::SHIRO_IP);
-        let c1 = format!("{} c1.ppy.sh", super::SHIRO_IP);
-        let a = format!("{} a.ppy.sh", super::SHIRO_IP);
-        let i = format!("{} i.ppy.sh", super::SHIRO_IP);
-        let bm6 = format!("{} bm6.ppy.sh", super::MIRROR_IP);
+    if is_read_only(HOSTS_PATH) {
+        set_read_only(HOSTS_PATH, false);
+        changed_perms = true;
+    }
 
-        let mut lines: Vec<&str> = content.split(NEW_LINE).collect();
+    let full_url_str_shiro = "http://".to_owned() + super::SHIRO_IP;
+    let full_url_str_mirror = "http://".to_owned() + super::MIRROR_IP;
 
-        for i in 0..lines.len() {
-            let mut line = lines[i];
+    let full_url_shiro: &str = full_url_str_shiro.as_str();
+    let full_url_mirror: &str = full_url_str_mirror.as_str();
 
-            if !line.starts_with("#") && line.contains("ppy.sh") {
-                //lines[i] = format!("#{}", line).as_str();
-                lines.remove(i);
-            }
+    let response_shiro = reqwest::get(full_url_shiro).unwrap();
+    let response_mirror = reqwest::get(full_url_mirror).unwrap();
+
+    if !response_shiro.status().is_success() || !response_mirror.status().is_success()  {
+        super::utils::send_notify("The server or the beatmap mirror is currently offline.");
+        return false;
+    }
+
+    // 1. Remove all other entries for ppy.sh
+    // 2. Add new entry for ppy.sh
+    let lines = read_file_lines(HOSTS_PATH);
+    let mut hosts = lines.clone();
+
+    for (i, line) in lines.iter().enumerate() {
+        if !line.starts_with("#") && line.contains("ppy.sh") {
+            hosts[i] = "#".to_owned() + line;
         }
+    }
 
-        lines.push("# shiro - added by kyo-rs server switcher");
-        lines.push(osu.as_str()); // String
-        lines.push(c.as_str());
-        lines.push(c1.as_str());
-        lines.push(a.as_str());
-        lines.push(i.as_str());
-        lines.push(bm6.as_str());
+    hosts.push("# Added by kyo-rs, a modern osu! server switcher".to_owned());
+    hosts.push(format!("{} osu.ppy.sh", address));
+    hosts.push(format!("{} c.ppy.sh", address));
+    hosts.push(format!("{} c1.ppy.sh", address));
+    hosts.push(format!("{} a.ppy.sh", address));
+    hosts.push(format!("{} i.ppy.sh", address));
+    hosts.push(format!("{} bm6.ppy.sh", super::MIRROR_IP));
+    hosts.push(NEW_LINE.to_owned());
 
-        // Clear the file, making it empty
-        hosts.set_len(0);
+    let result = hosts.join(NEW_LINE);
 
-        let mut writer = std::fs::OpenOptions::new()
-            .append(true)
-            .open(HOSTS_PATH)
-            .expect("Hosts file does not exist.");
+    let file = std::fs::File::create(HOSTS_PATH).unwrap();
+    file.set_len(0).unwrap();
 
-        for line in lines {
-            writer.write_all(format!("{}{}", line, NEW_LINE).as_bytes());
-        }
+    std::fs::write(HOSTS_PATH, result).unwrap();
 
-        writer.flush().unwrap();
+    if changed_perms {
+        set_read_only(HOSTS_PATH, true);
+    }
 
-        success = true;
-    });
-
-    return success;
+    return true;
 }
 
 pub fn revert() -> bool {
-    std::thread::spawn(move || {
+    let mut changed_perms = false;
 
-    });
+    if !is_connected() {
+        super::utils::send_notify("You are already disconnected.");
+        return true;
+    }
 
-    return false;
+    if is_read_only(HOSTS_PATH) {
+        set_read_only(HOSTS_PATH, false);
+        changed_perms = true;
+    }
+
+    let lines = read_file_lines(HOSTS_PATH);
+    let mut hosts = lines.clone();
+
+    for (i, line) in lines.iter().enumerate() {
+        if line.starts_with("#") && line.contains("kyo-rs") {
+            for j in i..(i + 7) {
+                hosts[j] = "removed by kyo-rs".to_owned();
+            }
+
+            break;
+        }
+    }
+
+    hosts.retain(|s| s != "removed by kyo-rs");
+
+    let result = hosts.join(NEW_LINE);
+
+    let file = std::fs::File::create(HOSTS_PATH).unwrap();
+    file.set_len(0).unwrap();
+
+    std::fs::write(HOSTS_PATH, result).unwrap();
+
+    if changed_perms {
+        set_read_only(HOSTS_PATH, true);
+    }
+
+    return true;
 }
 
 pub fn is_connected() -> bool {
@@ -113,4 +158,23 @@ pub fn is_connected() -> bool {
     }
 
     return false;
+}
+
+fn is_read_only(file: &str) -> bool {
+    let perms = std::fs::metadata(file).unwrap().permissions();
+    return perms.readonly();
+}
+
+fn set_read_only(file: &str, read_only: bool) {
+    let mut perms = std::fs::metadata(file).unwrap().permissions();
+    perms.set_readonly(read_only);
+    std::fs::set_permissions(file, perms).unwrap();
+}
+
+fn read_file_lines<P>(filename: P) -> Vec<String> where P: AsRef<std::path::Path>, {
+    let file = std::fs::File::open(filename).unwrap();
+    let buf = std::io::BufReader::new(file);
+    buf.lines()
+        .map(|l| l.unwrap())
+        .collect()
 }
