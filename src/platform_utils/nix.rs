@@ -21,10 +21,9 @@ extern crate libc;
 extern crate notify_rust;
 
 pub fn is_root() -> bool {
-    /*unsafe {
+    unsafe {
         libc::getuid() == 0
-    }*/
-    true
+    }
 }
 
 pub fn install_cert(cert: &str) {
