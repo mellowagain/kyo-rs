@@ -19,9 +19,13 @@
 extern crate base64;
 extern crate html_minifier;
 
+#[cfg(windows)]
+extern crate winres;
+
 use std::io::Read;
 
 fn main() {
+    // Minify and pack frontend .html, .css and .js files (as well as backgrounds and stuff)
     let css = "<style>".to_owned() + include_str!("resources/index.css") + "</style>";
     let js = "<script>".to_owned() + include_str!("resources/index.js") + "</script>";
     let background_jpg = "data:image/jpeg;base64,".to_owned() + include_str!("resources/img/background.jpg.base64");
@@ -38,4 +42,22 @@ fn main() {
     let html: String = minifier.get_html().chars().skip(5).collect();
 
     std::fs::write("resources/index.include.html", html);
+
+    // Set Windows manifest
+    install_manifest();
+}
+
+#[cfg(windows)]
+fn install_manifest() {
+    let mut res = winres::WindowsResource::new();
+
+    res.set_manifest(include_str!("resources/manifest.xml"));
+    res.set_icon("resources/icon.ico");
+
+    res.compile().unwrap();
+}
+
+#[cfg(unix)]
+fn install_manifest() {
+
 }

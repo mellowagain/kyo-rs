@@ -40,5 +40,8 @@ winapi = "0.3.6"
 user32-sys = "0.2.0"
 winrt = { version = "0.5.1", features = [ "windows-data", "windows-ui" ] }
 
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1.6"
+
 [target.'cfg(unix)'.dependencies]
 notify-rust = "3.4.2"
