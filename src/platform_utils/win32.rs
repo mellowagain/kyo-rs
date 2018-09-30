@@ -27,6 +27,10 @@ pub fn is_root() -> bool {
     }
 }
 
+pub fn install_cert(cert: &str) {
+    // TODO
+}
+
 pub fn send_notify(msg: &str) {
     use winrt::*;
     use winrt::windows::data::xml::dom::*;
