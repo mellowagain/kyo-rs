@@ -19,8 +19,6 @@
 extern crate std;
 extern crate reqwest;
 
-use std::io::Read;
-use std::io::Write;
 use std::io::BufRead;
 
 #[cfg(windows)]
@@ -142,7 +140,7 @@ pub fn revert() -> bool {
 }
 
 pub fn is_connected() -> bool {
-    let mut file = std::fs::File::open(HOSTS_PATH).unwrap();
+    let file = std::fs::File::open(HOSTS_PATH).unwrap();
 
     for content in std::io::BufReader::new(file).lines() {
         let unwrapped = content.unwrap();
