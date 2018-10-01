@@ -36,12 +36,12 @@ static RESULT_CERT_NAME: &'static str = r#"shiro.crt"#; // Always needs to end i
 static CONTENT: &'static str = include_str!("../resources/index.include.html");
 
 fn main() {
-    let user_data = ();
-
     if !utils::is_root() {
         utils::send_notify("Please run this program with elevated permissions. (Administrator or root)");
         std::process::exit(1);
     }
+
+    let user_data = ();
 
     web_view::run(
         "kyo-rs",
