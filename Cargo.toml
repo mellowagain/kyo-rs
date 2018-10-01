@@ -39,6 +39,7 @@ base64 = "0.9.3"
 winapi = "0.3.6"
 user32-sys = "0.2.0"
 winrt = { version = "0.5.1", features = [ "windows-data", "windows-ui" ] }
+winrt-notification = "0.2.2"
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1.6"
