@@ -22,7 +22,7 @@ extern crate winapi;
 extern crate winrt;
 extern crate winrt_notification;
 
-use winrt::um::wincrypt::*;
+use winapi::um::wincrypt::*;
 use winrt_notification::{Duration, Sound, Toast};
 
 pub fn is_root() -> bool {
