@@ -36,7 +36,7 @@ html-minifier = "1.1.2"
 base64 = "0.9.3"
 
 [target.'cfg(windows)'.dependencies]
-winapi = "0.3.6"
+winapi = { version = "0.3.6", features = [ "shellapi", "wincrypt" ] }
 user32-sys = "0.2.0"
 winrt = { version = "0.5.1", features = [ "windows-data", "windows-ui" ] }
 winrt-notification = "0.2.2"

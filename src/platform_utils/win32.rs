@@ -22,16 +22,34 @@ extern crate winapi;
 extern crate winrt;
 extern crate winrt_notification;
 
+use winrt::um::wincrypt::*;
 use winrt_notification::{Duration, Sound, Toast};
 
 pub fn is_root() -> bool {
-    unsafe {
-        user32::IsUserAnAdmin() // This doesn't exist
-    }
+    /*unsafe {
+        winapi::vc::shell::IsUserAnAdmin()
+    }*/
+
+    // The current method above is not implemented in the winapi crate
+    // Workaround this by *requiring* the program to be started
+    // with admin permissions by specifying it in the manifest.
+    true
 }
 
 pub fn install_cert(cert: &str) {
-    // TODO
+    unsafe {
+        let cert_store: HCERTSTORE = CertOpenSystemStoreA(0, "ROOT");
+
+        CertAddEncodedCertificateToStore(
+            cert_store,
+            X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+            cert,
+            cert.len(),
+            CERT_STORE_ADD_USE_EXISTING
+        );
+
+        CertCloseStore(cert_store, 0);
+    }
 }
 
 pub fn send_notify(msg: &str) {
