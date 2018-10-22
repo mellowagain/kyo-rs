@@ -77,6 +77,7 @@ pub fn overwrite(address: &str) -> bool {
     hosts.push("# Added by kyo-rs, a modern osu! server switcher".to_owned());
     hosts.push(format!("{} osu.ppy.sh", address));
     hosts.push(format!("{} c.ppy.sh", address));
+    hosts.push(format!("{} ce.ppy.sh", address));
     hosts.push(format!("{} c1.ppy.sh", address));
     hosts.push(format!("{} a.ppy.sh", address));
     hosts.push(format!("{} i.ppy.sh", address));
