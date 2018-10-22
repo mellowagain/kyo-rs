@@ -19,6 +19,11 @@
 extern crate web_view;
 extern crate serde_json;
 
+#[cfg(windows)]
+extern crate winrt_notification;
+#[cfg(windows)]
+extern crate winapi;
+
 mod cert;
 mod hosts;
 mod platform_utils;

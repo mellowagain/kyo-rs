@@ -23,7 +23,7 @@ extern crate winrt;
 extern crate winrt_notification;
 
 use winapi::um::wincrypt::*;
-use winrt_notification::{Duration, Sound, Toast};
+use winrt_notification::{Duration, Toast};
 
 pub fn is_root() -> bool {
     /*unsafe {
@@ -38,14 +38,19 @@ pub fn is_root() -> bool {
 
 pub fn install_cert(cert: &str) {
     unsafe {
-        let cert_store: HCERTSTORE = CertOpenSystemStoreA(0, "ROOT");
+        let root_str = std::ffi::CString::new("ROOT").unwrap();
+        let cert_str = std::ffi::CString::new(cert).unwrap();
+
+        let context_ptr: *mut PCCERT_CONTEXT = std::ptr::null_mut();
+        let cert_store: HCERTSTORE = CertOpenSystemStoreA(0, root_str.as_ptr());
 
         CertAddEncodedCertificateToStore(
             cert_store,
             X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-            cert,
-            cert.len(),
-            CERT_STORE_ADD_USE_EXISTING
+            cert_str.as_ptr() as *const _,
+            cert.len() as u32,
+            CERT_STORE_ADD_USE_EXISTING,
+            context_ptr
         );
 
         CertCloseStore(cert_store, 0);

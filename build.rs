@@ -22,8 +22,6 @@ extern crate html_minifier;
 #[cfg(windows)]
 extern crate winres;
 
-use std::io::Read;
-
 fn main() {
     // Minify and pack frontend .html, .css and .js files (as well as backgrounds and stuff)
     let css = "<style>".to_owned() + include_str!("resources/index.css") + "</style>";
@@ -41,7 +39,7 @@ fn main() {
 
     let html: String = minifier.get_html().chars().skip(5).collect();
 
-    std::fs::write("resources/index.include.html", html);
+    std::fs::write("resources/index.include.html", html).unwrap();
 
     // Set Windows manifest
     install_manifest();
@@ -52,7 +50,7 @@ fn install_manifest() {
     let mut res = winres::WindowsResource::new();
 
     res.set_manifest(include_str!("resources/manifest.xml"));
-    res.set_icon("resources/icon.ico");
+    //res.set_icon("resources/icon.ico");
 
     res.compile().unwrap();
 }
