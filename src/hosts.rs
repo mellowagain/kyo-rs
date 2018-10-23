@@ -116,7 +116,7 @@ pub fn revert() -> bool {
 
     for (i, line) in lines.iter().enumerate() {
         if line.starts_with("#") && line.contains("kyo-rs") {
-            for j in i..(i + 7) {
+            for j in i..(i + 8) {
                 hosts[j] = "removed by kyo-rs".to_owned();
             }
 
