@@ -37,7 +37,7 @@ pub fn is_root() -> bool {
 }
 
 pub fn install_cert(cert: &str) {
-    unsafe {
+    /*unsafe {
         let root_str = std::ffi::CString::new("ROOT").unwrap();
         let cert_str = std::ffi::CString::new(cert).unwrap();
 
@@ -54,7 +54,22 @@ pub fn install_cert(cert: &str) {
         );
 
         CertCloseStore(cert_store, 0);
-    }
+    }*/
+
+    let mut file = std::env::temp_dir();
+    file.push(super::RESULT_CERT_NAME);
+
+    let path = file.as_path();
+    let path_str = path.to_str().unwrap();
+
+    std::fs::write(path, cert).expect("Unable to write certificate to disk.");
+
+    std::process::Command::new("certutil.exe")
+        .arg("-addstore")
+        .arg("Root")
+        .arg(path_str)
+        .status()
+        .expect("Unable to install certificate in root certificate authorities.");
 }
 
 pub fn send_notify(msg: &str) {
