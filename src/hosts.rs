@@ -78,10 +78,23 @@ pub fn overwrite(address: &str) -> bool {
     hosts.push(format!("{} osu.ppy.sh", address));
     hosts.push(format!("{} c.ppy.sh", address));
     hosts.push(format!("{} ce.ppy.sh", address));
-    hosts.push(format!("{} c1.ppy.sh", address));
+
+    for i in 1..7 {
+        if i == 2 {
+            continue;
+        }
+
+        hosts.push(format!("{} c{}.ppy.sh", address, i));
+    }
+
     hosts.push(format!("{} a.ppy.sh", address));
     hosts.push(format!("{} i.ppy.sh", address));
-    hosts.push(format!("{} bm6.ppy.sh", super::MIRROR_IP));
+
+    for i in 4..7 {
+        hosts.push(format!("{} bm{}.ppy.sh", super::MIRROR_IP, i));
+    }
+
+
     hosts.push(NEW_LINE.to_owned());
 
     let result = hosts.join(NEW_LINE);
