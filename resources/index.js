@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-"use strict";
-
 // Invoked by frontend
 
 function connectShiro() {
@@ -76,7 +74,7 @@ function displayError() {
     let input = document.getElementById("input-address");
     input.classList.add("shake");
 
-    setTimeout(() => {
+    setTimeout(function() {
         input.classList.remove("shake");
     }, 820);
 }
