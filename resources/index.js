@@ -18,6 +18,14 @@
 
 // Invoked by frontend
 
+function updateData() {
+    invokeBackend(
+        {
+            cmd: "update"
+        }
+    );
+}
+
 function connectShiro() {
     invokeBackend(
         {
@@ -102,4 +110,5 @@ document.onkeyup = function (event) {
 
 // Init
 
+updateData();
 document.getElementById("connect-address").focus();

@@ -54,26 +54,21 @@ fn main() {
         Some((400, 260)),
         false,
         true,
-        move |web_view| {
-            std::thread::spawn(move || {
-                // Run this outside of the UI thread to not block the init process
-                let connected = hosts::is_connected();
-                let connect_address = format!("document.getElementById('connect-address').value = '{}';", SHIRO_IP);
-                let button_changer = if connected { "toggleConnectButton();" } else { "" };
-                let js = &format!("{}{}", connect_address, button_changer);
-
-                // and send it off into the deep void of the UI
-                web_view.dispatch(|web_view, _user_data| {
-                    web_view.eval(js);
-                });
-            });
-        },
+        move |_web_view| {},
         move |web_view, args, _user_data| {
             let json: serde_json::Value = serde_json::from_str(args).unwrap();
             let cmd = json["cmd"].as_str().unwrap();
             let address = json["address"].as_str().unwrap_or_default();
 
             match cmd {
+                "update" => {
+                    let connected = hosts::is_connected();
+                    let connect_address = format!("document.getElementById('connect-address').value = '{}';", SHIRO_IP);
+                    let button_changer = if connected { "toggleConnectButton();" } else { "" };
+
+                    let js = &format!("{}{}", connect_address, button_changer);
+                    web_view.eval(js);
+                }
                 "connect" => {
                     web_view.eval(if hosts::overwrite(address) { "toggleConnectButton();" } else { "displayError();" });
                 }
